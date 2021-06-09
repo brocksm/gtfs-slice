@@ -1,14 +1,14 @@
 CREATE TEMP TABLE network
 AS 
-	WITH 
-		FilteredRoutes AS (
-			SELECT DISTINCT
-				route_id,
-				route_type,
-				route_color
-			FROM routes
-			WHERE TRUE
-		),
+  WITH 
+    FilteredRoutes AS (
+      SELECT DISTINCT
+        route_id,
+        route_type,
+        route_color
+      FROM routes
+      WHERE TRUE
+    ),
     CountOfStopsByTripId AS (
       SELECT
         trips.route_id,
@@ -21,11 +21,11 @@ AS
       GROUP BY 1, 2, 3
     ),
     CountOfStopsByShapeId AS (
-    	SELECT
-    		trips.route_id,
-    		trips.shape_id,
-    		COUNT(DISTINCT stop_times.stop_id) AS count_of_stops
-    	FROM FilteredRoutes
+      SELECT
+        trips.route_id,
+        trips.shape_id,
+        COUNT(DISTINCT stop_times.stop_id) AS count_of_stops
+      FROM FilteredRoutes
       INNER JOIN trips USING (route_id)
       INNER JOIN stop_times USING (trip_id)
       GROUP BY 1, 2
@@ -44,60 +44,60 @@ AS
       WHERE CountOfStopsByTripId.count_of_stops = CountOfStopsByShapeId.count_of_stops
     ),
     Main AS (
-    	SELECT
-    		*,
-				RANK() 
+      SELECT
+        *,
+        RANK() 
           OVER (PARTITION BY shape_id ORDER BY stop_sequence) AS stop_order
       FROM (    		
-				SELECT DISTINCT
-					routes.route_type,
-					routes.route_color,
-					trips.route_id,
-					trips.shape_id,
-					stops.parent_station,
-					stops.stop_id,
-					stops.stop_name,
-					stop_times.stop_sequence,
-					stops.stop_lon,
-					stops.stop_lat
-				FROM FilteredRoutes AS routes
-				INNER JOIN FilteredTrips AS trips USING (route_id)
-				INNER JOIN stop_times USING (trip_id)
-				INNER JOIN stops USING (stop_id)
-			)
+        SELECT DISTINCT
+          routes.route_type,
+          routes.route_color,
+          trips.route_id,
+          trips.shape_id,
+          stops.parent_station,
+          stops.stop_id,
+          stops.stop_name,
+          stop_times.stop_sequence,
+          stops.stop_lon,
+          stops.stop_lat
+        FROM FilteredRoutes AS routes
+        INNER JOIN FilteredTrips AS trips USING (route_id)
+        INNER JOIN stop_times USING (trip_id)
+        INNER JOIN stops USING (stop_id)
+      )
     ),
     EndPoints AS (
-    	SELECT
-    		route_id, 
-    		parent_station,
+      SELECT
+        route_id, 
+        parent_station,
         SUM(stop_order = 1 OR stop_order = max_stop_order)
-        	= COUNT(shape_id) AS is_endpoint
+          = COUNT(shape_id) AS is_endpoint
       FROM (    		
-				SELECT
-					route_id,
-					shape_id,
-					parent_station,
-					stop_order,				
-					MAX(stop_order) 
-						OVER (PARTITION BY shape_id) AS max_stop_order
-				FROM Main
-				GROUP BY 1, 2, 3, 4
-			)
-			GROUP BY 1, 2
-		)	
-	SELECT
-		Main.*,
-		EndPoints.is_endpoint,
-		PriorStop.stop_id AS prior_stop_id,
-		NextStop.stop_id AS next_stop_id
-	FROM Main
-	INNER JOIN EndPoints USING (route_id, parent_station)
-	LEFT JOIN Main AS PriorStop
-		ON Main.route_id = PriorStop.route_id
-		AND Main.shape_id = PriorStop.shape_id
-		AND Main.stop_order - 1 = PriorStop.stop_order
-	LEFT JOIN Main AS NextStop
-		ON Main.route_id = NextStop.route_id
-		AND Main.shape_id = NextStop.shape_id
-		AND Main.stop_order + 1 = NextStop.stop_order
-	ORDER BY Main.route_id, Main.shape_id, Main.stop_order
+        SELECT
+          route_id,
+          shape_id,
+          parent_station,
+          stop_order,				
+          MAX(stop_order) 
+            OVER (PARTITION BY shape_id) AS max_stop_order
+        FROM Main
+        GROUP BY 1, 2, 3, 4
+      )
+      GROUP BY 1, 2
+    )	
+  SELECT
+    Main.*,
+    EndPoints.is_endpoint,
+    PriorStop.stop_id AS prior_stop_id,
+    NextStop.stop_id AS next_stop_id
+  FROM Main
+  INNER JOIN EndPoints USING (route_id, parent_station)
+  LEFT JOIN Main AS PriorStop
+    ON Main.route_id = PriorStop.route_id
+    AND Main.shape_id = PriorStop.shape_id
+    AND Main.stop_order - 1 = PriorStop.stop_order
+  LEFT JOIN Main AS NextStop
+    ON Main.route_id = NextStop.route_id
+    AND Main.shape_id = NextStop.shape_id
+    AND Main.stop_order + 1 = NextStop.stop_order
+  ORDER BY Main.route_id, Main.shape_id, Main.stop_order
