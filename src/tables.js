@@ -1,8 +1,8 @@
-const routes = require('./routes');
-const shapes = require('./shapes');
-const stops = require('./stops');
-const stop_times = require('./stop_times');
-const trips = require('./trips');
+const routes = require('./gtfs/routes');
+const shapes = require('./gtfs/shapes');
+const stops = require('./gtfs/stops');
+const stop_times = require('./gtfs/stop_times');
+const trips = require('./gtfs/trips');
 
 module.exports = [
 	routes,
