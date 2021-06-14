@@ -25,4 +25,4 @@ if (commander.args.length === 0) {
 // define globals
 database = new sqlite(commander.args[0]);
 filename = path.basename(commander.args[0], '.db');
-directory = commander.url ? `${__dirname}/${rootName}/` : `${__dirname}/`;
+directory = commander.url ? `${__dirname}/${filename}/` : `${__dirname}/`;

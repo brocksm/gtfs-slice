@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const unzip = require('adm-zip');
-const fs = require('fs');
       
 module.exports = function (url) {
   return fetch(url)

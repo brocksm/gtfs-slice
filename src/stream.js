@@ -1,10 +1,9 @@
-const fs = require('fs');
 const csv = require('csv-parser');
 
 module.exports = function (table, callback, bufferSize) {
   let buffer = [],
       rows = 0,
-      readstream = fs.createReadStream(`${rootDirectory}${table.baseFilename}.txt`);
+      readstream = fs.createReadStream(path.resolve(`${directory}${table.baseFilename}.txt`));
 
   return new Promise(function(resolve) {
     readstream
