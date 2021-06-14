@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+
+const commander = require('commander');
+const sqlite = require('better-sqlite3');
+const fetch = require('../src/fetch')
+const import = require('../src/import');
+// global modules
+path = require('path');
+fs = require('fs');
+
+commander
+	.option("-u, --url <url>", "a URL source for GTFS static files")
+	.option("-i, --import", "force import of GTFS data into sqlite")
+	.option("-r, --routes <routeList>", "a comma separated list of route ids. A leading `!=` indicates excluded routes")
+	.option("-t, --types <typeList>", "a comma separated list of route types. A leading `!=` indicates excluded types")
+	.option("-m, --merge <mergeList>", "a comma separated list of input:output route ids (useful for renaming / consolidating like routes)")
+	.parse(process.argv);
+
+// check for database arg
+if (commander.args.length === 0) { 
+	console.error('No source database provided');
+	process.exit(1);
+}
+
+// define globals
+database = new sqlite(commander.args[0]);
+filename = path.basename(commander.args[0], '.db');
+directory = commander.url ? `${__dirname}/${rootName}/` : `${__dirname}/`;
