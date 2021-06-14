@@ -4,7 +4,7 @@ const commander = require('commander');
 const sqlite = require('better-sqlite3');
 const fetch = require('../src/fetch')
 const import = require('../src/import');
-const tables = require('./tables');
+const tables = require('../src/tables');
 // global modules
 path = require('path');
 fs = require('fs');
@@ -26,3 +26,4 @@ if (commander.args.length === 0) {
 const database = new sqlite(commander.args[0]);
 const filename = path.basename(commander.args[0], '.db');
 const directory = commander.url ? `${__dirname}/${filename}/` : `${__dirname}/`;
+const tableNames = tables.map(o => o.baseFilename);
