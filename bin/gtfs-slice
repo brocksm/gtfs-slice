@@ -3,7 +3,7 @@
 const commander = require('commander');
 const sqlite = require('better-sqlite3');
 const fetch = require('../src/fetch')
-const import = require('../src/import');
+const _import = require('../src/import');
 const tables = require('../src/tables');
 const check = require('../src/exists');
 // global modules
@@ -28,3 +28,17 @@ const database = new sqlite(commander.args[0]);
 const filename = path.basename(commander.args[0], '.db');
 const directory = commander.url ? `${__dirname}/${filename}/` : `${__dirname}/`;
 const tableNames = tables.map(o => o.baseFilename);
+
+if (commander.url) {fetch(commander.url, filename, directory)}
+
+if (commander.url || commander.import) {
+	new Promise(function(resolve) {
+		exists.filesExist(tableNames, directory);
+		resolve();
+	}).catch((error) => {console.error(error)})
+	.then(async() => {await _import(tables, database)})
+	.then(() => {exists.tablesExist(tableNames, database)})
+	.then(() => {gtfsSlice()});
+}
+
+else {gtfsSlice()}
