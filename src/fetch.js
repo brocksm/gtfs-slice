@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const unzip = require('adm-zip');
       
-module.exports = function (url) {
+module.exports = function (url, filename, directory) {
   return fetch(url)
   .then((response) => {
     if (!response.ok) {

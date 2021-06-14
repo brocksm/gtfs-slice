@@ -1,7 +1,6 @@
 const stream = require('./stream');
-const tables = require('./tables');
 
-module.exports = async function () {
+module.exports = async function (tables, database) {
   for (const table of tables) {
     const tableName = table['name'];
     const schema = table['schema'];
