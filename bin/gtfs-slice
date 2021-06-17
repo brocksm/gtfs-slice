@@ -6,6 +6,7 @@ const fetch = require('../src/fetch')
 const _import = require('../src/import');
 const tables = require('../src/tables');
 const check = require('../src/exists');
+const buildQuery = require('../src/buildQuery');
 // global modules
 path = require('path');
 fs = require('fs');
@@ -42,3 +43,15 @@ if (commander.url || commander.import) {
 }
 
 else {gtfsSlice()}
+
+function gtfsSlice() {
+
+  const createNetwork = 
+    buildQuery(
+      fs.readfileSync(path.resolve('../src/sqlite_queries/network.sql')),
+      commander.types,
+      commander.routes);
+
+  // create temporary table 'network'
+  database.execute(createNetwork);
+}
