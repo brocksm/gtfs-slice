@@ -52,7 +52,9 @@ AS
         SELECT DISTINCT
           routes.route_type,
           routes.route_color,
-          trips.route_id,
+          IFNULL(
+            merged_routes.route_id,
+            trips.route_id) AS route_id,
           trips.shape_id,
           stops.parent_station,
           stops.stop_id,
@@ -61,6 +63,7 @@ AS
           stops.stop_lon,
           stops.stop_lat
         FROM FilteredRoutes AS routes
+        LEFT JOIN MergedRoutes AS merged_routes USING(route_id)
         INNER JOIN FilteredTrips AS trips USING (route_id)
         INNER JOIN stop_times USING (trip_id)
         INNER JOIN stops USING (stop_id)

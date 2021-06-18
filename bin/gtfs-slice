@@ -46,6 +46,13 @@ else {gtfsSlice()}
 
 function gtfsSlice() {
 
+  const createNewRouteIds =
+    mergeRouteIds(
+      fs.readfileSync(path.resolve('../src/sqlite_queries/map_routes.sql')),
+      commander.merge);
+
+  database.execute(createNewRouteIds);
+
   const createNetwork = 
     buildQuery(
       fs.readfileSync(path.resolve('../src/sqlite_queries/network.sql')),
