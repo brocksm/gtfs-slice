@@ -13,5 +13,8 @@ module.exports = {
     return arr.flatMap((v, i) =>
       choose(arr.slice(i+1), k-1, [...prefix, v])
     );
+  },
+  defined: (arg) => {
+    return typeof arg != 'undefined';
   }
 } 
