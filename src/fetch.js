@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const unzip = require('adm-zip');
       
-module.exports = function (url, filename, directory) {
+module.exports = function (url, filename) {
   return fetch(url)
   .then((response) => {
     if (!response.ok) {
@@ -11,5 +11,5 @@ module.exports = function (url, filename, directory) {
     else {return response.buffer();}
   })		
   .then((buffer) => {fs.writeFileSync(`${filename}.zip`, buffer);})
-  .then(() => {new unzip(`${filename}.zip`).extractAllTo(directory);});
+  .then(() => {new unzip(`${filename}.zip`).extractAllTo('./');});
 }
