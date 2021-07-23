@@ -1,17 +1,23 @@
 module.exports = {
-  filesExist: ({tableNames, directory}) => {
-    const dirFiles = fs.readdirSync(directory)
+  directoryExists: (directory) => {
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory);
+    }
+    process.chdir(directory);
+  },
+  filesExist: (tableNames) => {
+    const dirFiles = fs.readdirSync('./')
       .filter(file => file.slice(-3) === 'txt')
       .map(file => path.basename(file, '.txt'));
             
     for (const name of tableNames) {
       if (!dirFiles.includes(name)) {
-        console.error(`missing required GTFS file ${name}.txt in ${path.resolve(directory)}`);
+        console.error(`missing required GTFS file ${name}.txt in ${path.resolve('./')}`);
         process.exit(1);
       }
     }
   },
-  tablesExist: ({tableNames, database}) => {
+  tablesExist: (tableNames, database) => {
     for (const name of tableNames) {
       // can't prepare this statement out of the loop, since sqlite
       // doesn't allow parameter binding for table names
