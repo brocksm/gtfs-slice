@@ -7,6 +7,8 @@ const _import = require('../src/import');
 const tables = require('../src/tables');
 const check = require('../src/exists');
 const buildQuery = require('../src/buildQuery');
+const mergeRouteIds = require('../src/mapRouteIds');
+const { resolve } = require('path');
 // global modules
 path = require('path');
 fs = require('fs');
@@ -26,32 +28,42 @@ if (commander.args.length === 0) {
 }
 
 const database = new sqlite(commander.args[0]);
+database.pragma('journal_mode = WAL');
 const filename = path.basename(commander.args[0], '.db');
-const directory = commander.url ? `${__dirname}/${filename}/` : `${__dirname}/`;
-const tableNames = tables.map(o => o.baseFilename);
+const opts = commander.opts();
+const directory = opts.url ? `${__dirname}/${filename}/` : `${__dirname}/`;
+const tableNames = tables.map(o => o.name);
 
-if (commander.url) {fetch(commander.url, filename, directory)}
+console.log("directory: " + directory)
+console.log(tableNames);
 
-if (commander.url || commander.import) {
-	new Promise(function(resolve) {
-		exists.filesExist(tableNames, directory);
-		resolve();
-	}).catch((error) => {console.error(error)})
-	.then(async() => {await _import(tables, database)})
-	.then(() => {exists.tablesExist(tableNames, database)})
-	.then(() => {gtfsSlice()});
+if (opts.url || opts.import) {
+
+	async function run() {
+		console.log(opts.url)
+		await check.directoryExists(directory);
+		//await opts.url ? fetch(opts.url, filename, directory) : () => {};
+		await fetch(opts.url, filename);
+		await check.filesExist(tableNames);
+		await _import(tables, database);
+		await check.tablesExist(tableNames, database);
+	};
+	run();
 }
+
 
 else {gtfsSlice()}
 
 function gtfsSlice() {
-
-  const createNewRouteIds =
+	const readOptions = {encoding:'utf8', flag:'r'};
+	const createNewRouteIds =
     mergeRouteIds(
-      fs.readfileSync(path.resolve('../src/sqlite_queries/map_routes.sql')),
-      commander.merge);
-
-  database.execute(createNewRouteIds);
+      fs.readFileSync(path.resolve('../src/sqlite_queries/mapRoutes.sql'), readOptions),
+      commander.merge ? 
+				commander.merge.split(':').map(r => r.split(',')) :
+				[]);
+	console.log(createNewRouteIds)			
+	database.exec(createNewRouteIds);
 
   const createNetwork = 
     buildQuery(
@@ -60,5 +72,5 @@ function gtfsSlice() {
       commander.routes);
 
   // create temporary table 'network'
-  database.execute(createNetwork);
+  database.exec(createNetwork);
 }
