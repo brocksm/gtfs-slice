@@ -1,0 +1,33 @@
+{
+  "name": "gtfs-slice",
+  "version": "1.0.0",
+  "description": "slices a GTFS transit network into it's composite stop-to-stop segments",
+  "main": "index.js",
+  "bin": {
+    "gtfs-slice": "bin/gtfs-slice"
+  },
+  "dependencies": {
+    "better-sqlite3": ">=7.4.0",
+    "commander": ">=7.2.0",
+    "csv-parser": "3.0.0",
+    "node-fetch": "2.6.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brocksm/gtfs-slice.git"
+  },
+  "keywords": [
+    "gtfs",
+    "transit",
+    "svg-path"
+  ],
+  "author": "Mike Brocks",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brocksm/gtfs-slice/issues"
+  },
+  "homepage": "https://github.com/brocksm/gtfs-slice#readme"
+}
