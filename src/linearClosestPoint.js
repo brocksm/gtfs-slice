@@ -8,5 +8,7 @@ module.exports = function (p0, p1, s) {
   	let x = (b*(b*s[0] - a*s[1]) - a*c) / denominator;
   	let y = (a*(-b*s[0] + a*s[1]) - b*c) / denominator;
 
-  	return [x, y]
+  	let d = Math.sqrt(Math.pow((x - s[0]), 2) +Math.pow((y - s[1]), 2))
+
+  	return {'x': x, 'y': y, 'distance': d};
 }
