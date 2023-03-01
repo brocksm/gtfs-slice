@@ -10,5 +10,5 @@ module.exports = function (p0, p1, s) {
 
   	let d = Math.sqrt(Math.pow((x - s[0]), 2) +Math.pow((y - s[1]), 2))
 
-  	return {'x': x, 'y': y, 'distance': d};
+  	return {'point': {'x': x, 'y': y}, 'distance': d};
 }
